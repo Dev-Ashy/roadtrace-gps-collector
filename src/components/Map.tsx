@@ -1,10 +1,8 @@
-import { Suspense, lazy, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LocateFixed, Map as MapIcon, MapPin } from "lucide-react";
 
 import type { LivePosition, SurveyPoint } from "@/lib/gps";
-
-const LeafletMap = lazy(() => import("@/components/LeafletMap"));
 
 type MapProps = {
   position: LivePosition | null;
