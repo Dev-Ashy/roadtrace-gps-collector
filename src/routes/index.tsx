@@ -34,6 +34,7 @@ const INITIAL_CENTER: LivePosition = {
 
 export const Route = createFileRoute("/")({
   ssr: false,
+  component: () => <div>Test</div>,
   head: () => ({
     meta: [
       { title: "RoadTrace — GPS Highway Survey Recorder" },
