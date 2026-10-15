@@ -34,7 +34,7 @@ const INITIAL_CENTER: LivePosition = {
 
 export const Route = createFileRoute("/")({
   ssr: false,
-  component: () => <div>Test</div>,
+  component: CollectorPage,
   head: () => ({
     meta: [
       { title: "RoadTrace — GPS Highway Survey Recorder" },
@@ -340,7 +340,7 @@ function CollectorPage() {
 
         <div className="workbench-layout">
           <div className="workbench-map">
-            <div className="min-w-0 overflow-hidden rounded-lg border border-border bg-map-surface p-4 h-[370px] sm:h-[450px] flex items-center justify-center text-muted-foreground">Map temporarily disabled for debugging</div>
+            <Map position={position} points={points} gpsReady={Boolean(position)} />
           </div>
           <LoggerGrid
             notes={notes}
