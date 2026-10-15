@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { CircleMarker, MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import * as L from "leaflet";
-import "leaflet/dist/leaflet.css";
 
 import { distanceInMeters, type LivePosition, type SurveyPoint } from "@/lib/gps";
 
