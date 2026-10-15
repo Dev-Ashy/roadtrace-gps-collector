@@ -49,13 +49,8 @@ export function Map({ position, points, gpsReady }: MapProps) {
       </div>
 
       <div className="relative h-[370px] sm:h-[450px]">
-        {showMap ? (
-          <Suspense fallback={<MapPlaceholder />}>
-            <LeafletMap position={position} points={points} followDevice={followDevice} />
-          </Suspense>
-        ) : (
-          <MapPlaceholder />
-        )}
+        <MapPlaceholder />
+        
         <div className="pointer-events-none absolute bottom-3 left-3 flex flex-wrap gap-x-3 gap-y-1.5 rounded-md border border-border bg-surface/95 px-3 py-2 text-[11px] text-foreground shadow-sm">
           <span className="inline-flex items-center gap-1.5"><span className="size-2 rounded-full bg-category-bridge" /> Bridge</span>
           <span className="inline-flex items-center gap-1.5"><span className="size-2 rounded-full bg-category-school" /> School</span>
