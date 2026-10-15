@@ -73,7 +73,7 @@ export default function LeafletMap({ position, points, followDevice }: LeafletMa
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <FollowDevice position={position} followDevice={followDevice} />
+      {/* <FollowDevice position={position} followDevice={followDevice} /> */}
       {position && (
         <Marker position={[position.latitude, position.longitude]} icon={positionIcon} zIndexOffset={1000}>
           <Popup>
