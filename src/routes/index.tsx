@@ -415,23 +415,41 @@ function SimpleCollectorPage() {
   const [points, setPoints] = useState<SurveyPoint[]>([]);
   const [notes, setNotes] = useState("");
   const [audioEnabled, setAudioEnabled] = useState(false);
+  const [gpsMessage, setGpsMessage] = useState("Requesting high-accuracy location");
 
   useEffect(() => {
     const existing = readSavedPoints();
     setPoints(existing);
-  }, []);
-
-  const handleLog = useCallback((category: SurveyCategory) => {
-    // minimal logging stub
-    setPoints(p => [...p]);
+    if (typeof navigator !== "undefined" && navigator.geolocation) {
+      const id = navigator.geolocation.watchPosition(
+        (pos) => {
+          setPosition({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            accuracy: pos.coords.accuracy,
+            speedKmh: pos.coords.speed ? pos.coords.speed * 3.6 : null,
+            altitude: pos.coords.altitude,
+            timestamp: new Date().toISOString(),
+          });
+          setGpsMessage("Live Signal Lock");
+        },
+        () => setGpsMessage("Location access denied"),
+        { enableHighAccuracy: true }
+      );
+      return () => navigator.geolocation.clearWatch(id);
+    }
   }, []);
 
   return (
     <main style={{padding: '2rem', fontFamily: 'sans-serif'}}>
       <h1>RoadTrace GPS Data Collector</h1>
-      <p>Map temporarily disabled. Core logging UI is loading…</p>
-      {/* Minimal UI placeholder */}
-      <div>Points logged: {points.length}</div>
+      <div style={{marginTop: '1rem'}}>
+        <strong>GPS Status:</strong> {gpsMessage}<br/>
+        <strong>Latitude:</strong> {position ? position.latitude.toFixed(6) : "—"}<br/>
+        <strong>Longitude:</strong> {position ? position.longitude.toFixed(6) : "—"}<br/>
+        <strong>Accuracy:</strong> {position ? `±${Math.round(position.accuracy)} m` : "—"}<br/>
+        <strong>Points logged:</strong> {points.length}
+      </div>
     </main>
   );
 }
