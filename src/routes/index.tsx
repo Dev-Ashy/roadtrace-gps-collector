@@ -508,80 +508,106 @@ function SimpleCollectorPage() {
   };
 
   return (
-    <main style={{padding: '2rem', fontFamily: 'system-ui, sans-serif', maxWidth: '960px', margin: '0 auto', color: '#111'}}>
+    <main style={{padding: '1.5rem 1rem', fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif', maxWidth: '1040px', margin: '0 auto', color: '#111', background: '#f6f7fb', minHeight: '100vh'}}>
       {toast && (
-        <div style={{position: 'fixed', top: '1.5rem', right: '1.5rem', background: '#111', color: '#fff', padding: '0.75rem 1rem', borderRadius: '8px', boxShadow: '0 4px 16px rgba(0,0,0,0.2)', zIndex: 1000}}>
+        <div style={{position: 'fixed', top: '1.5rem', right: '1.5rem', background: '#0ea5e9', color: '#fff', padding: '0.75rem 1rem', borderRadius: '10px', boxShadow: '0 8px 24px rgba(0,0,0,0.18)', zIndex: 1000, fontWeight: 600}}>
           {toast}
         </div>
       )}
       <header style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem'}}>
-        <h1 style={{fontSize: '1.75rem', fontWeight: 700, margin: 0}}>RoadTrace GPS Data Collector</h1>
-        <span style={{fontSize: '0.85rem', color: '#666'}}>Map temporarily disabled</span>
+        <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem'}}>
+          <div style={{width: '40px', height: '40px', borderRadius: '10px', background: 'linear-gradient(135deg,#0ea5e9,#6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700}}>RT</div>
+          <h1 style={{fontSize: '1.75rem', fontWeight: 800, margin: 0, letterSpacing: '-0.02em'}}>RoadTrace</h1>
+        </div>
+        <span style={{fontSize: '0.85rem', color: '#64748b', background: '#fff', padding: '0.35rem 0.75rem', borderRadius: '999px', border: '1px solid #e2e8f0'}}>Map disabled</span>
       </header>
 
-      <section style={{padding: '1.25rem', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff', boxShadow: '0 1px 2px rgba(0,0,0,0.04)'}}>
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: '1rem'}}>
-          <div><div style={{fontSize: '0.75rem', color: '#666'}}>GPS Status</div><div style={{fontWeight: 600}}>{gpsMessage}</div></div>
-          <div><div style={{fontSize: '0.75rem', color: '#666'}}>Latitude</div><div style={{fontWeight: 600}}>{position ? position.latitude.toFixed(6) : "—"}</div></div>
-          <div><div style={{fontSize: '0.75rem', color: '#666'}}>Longitude</div><div style={{fontWeight: 600}}>{position ? position.longitude.toFixed(6) : "—"}</div></div>
-          <div><div style={{fontSize: '0.75rem', color: '#666'}}>Accuracy</div><div style={{fontWeight: 600}}>{position ? `±${Math.round(position.accuracy)} m` : "—"}</div></div>
-          <div><div style={{fontSize: '0.75rem', color: '#666'}}>Speed</div><div style={{fontWeight: 600}}>{position?.speedKmh ? `${position.speedKmh.toFixed(1)} km/h` : "—"}</div></div>
-          <div><div style={{fontSize: '0.75rem', color: '#666'}}>Altitude</div><div style={{fontWeight: 600}}>{position?.altitude ? `${Math.round(position.altitude)} m` : "—"}</div></div>
+      <section style={{padding: '1.25rem', borderRadius: '16px', background: 'linear-gradient(135deg,#ffffff,#f8fafc)', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0'}}>
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px,1fr))', gap: '1rem'}}>
+          <div style={{background: '#fff', padding: '0.9rem', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
+            <div style={{fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em'}}>GPS Status</div>
+            <div style={{fontWeight: 700, marginTop: '0.25rem', color: position ? '#16a34a' : '#dc2626'}}>{gpsMessage}</div>
+          </div>
+          <div style={{background: '#fff', padding: '0.9rem', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
+            <div style={{fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase'}}>Latitude</div>
+            <div style={{fontWeight: 700, marginTop: '0.25rem'}}>{position ? position.latitude.toFixed(6) : "—"}</div>
+          </div>
+          <div style={{background: '#fff', padding: '0.9rem', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
+            <div style={{fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase'}}>Longitude</div>
+            <div style={{fontWeight: 700, marginTop: '0.25rem'}}>{position ? position.longitude.toFixed(6) : "—"}</div>
+          </div>
+          <div style={{background: '#fff', padding: '0.9rem', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
+            <div style={{fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase'}}>Accuracy</div>
+            <div style={{fontWeight: 700, marginTop: '0.25rem'}}>{position ? `±${Math.round(position.accuracy)} m` : "—"}</div>
+          </div>
+          <div style={{background: '#fff', padding: '0.9rem', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
+            <div style={{fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase'}}>Speed</div>
+            <div style={{fontWeight: 700, marginTop: '0.25rem'}}>{position?.speedKmh ? `${position.speedKmh.toFixed(1)} km/h` : "—"}</div>
+          </div>
+          <div style={{background: '#fff', padding: '0.9rem', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
+            <div style={{fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase'}}>Altitude</div>
+            <div style={{fontWeight: 700, marginTop: '0.25rem'}}>{position?.altitude ? `${Math.round(position.altitude)} m` : "—"}</div>
+          </div>
         </div>
-        <div style={{marginTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-          <div style={{fontSize: '0.9rem'}}>Points logged: <strong>{points.length}</strong></div>
-          <label style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem'}}>
+        <div style={{marginTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem'}}>
+          <div style={{fontSize: '0.95rem', background: '#fff', padding: '0.5rem 0.9rem', borderRadius: '999px', border: '1px solid #e2e8f0'}}>Points logged: <strong>{points.length}</strong></div>
+          <label style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', background: '#fff', padding: '0.5rem 0.9rem', borderRadius: '999px', border: '1px solid #e2e8f0'}}>
             <input type="checkbox" checked={autoCollect} onChange={e => setAutoCollect(e.target.checked)} />
             Auto-collect every 10s when moving ≥15m
           </label>
         </div>
       </section>
 
-      <section style={{marginTop: '2rem'}}>
-        <h2 style={{fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.75rem'}}>Log Hazard</h2>
-        <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional notes" style={{width: '100%', minHeight: '72px', padding: '0.75rem', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '1rem', fontFamily: 'inherit'}} />
+      <section style={{marginTop: '2rem', background: '#fff', padding: '1.25rem', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.04)'}}>
+        <h2 style={{fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+          <span style={{display: 'inline-flex', width: '28px', height: '28px', borderRadius: '8px', background: '#0ea5e9', color: '#fff', alignItems: 'center', justifyContent: 'center'}}>⚠</span>
+          Log Hazard
+        </h2>
+        <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional notes" style={{width: '100%', minHeight: '72px', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '12px', marginBottom: '1rem', fontFamily: 'inherit'}} />
         <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem'}}>
-          {categories.map(cat => (
-            <button key={cat} onClick={() => handleLog(cat)} style={{padding: '0.85rem', border: '1px solid #e5e7eb', borderRadius: '10px', background: '#fff', cursor: 'pointer', fontWeight: 500, boxShadow: '0 1px 1px rgba(0,0,0,0.03)', transition: 'transform 0.05s'}} onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.98)')} onMouseUp={e => (e.currentTarget.style.transform = '')}>
+          {categories.map((cat, i) => {
+            const colors = ['#0ea5e9','#8b5cf6','#f59e0b','#10b981','#ef4444','#6366f1'];
+            return (
+            <button key={cat} onClick={() => handleLog(cat)} style={{padding: '0.9rem', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fff', cursor: 'pointer', fontWeight: 600, boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'transform 0.05s', borderLeft: `4px solid ${colors[i % colors.length]}`}} onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.98)')} onMouseUp={e => (e.currentTarget.style.transform = '')}>
               {cat}
             </button>
-          ))}
+          )})}
         </div>
       </section>
 
       <section style={{marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem'}}>
-        <button onClick={exportCSV} style={{padding: '0.85rem 1.5rem', border: '1px solid #111', borderRadius: '10px', background: '#111', color: '#fff', cursor: 'pointer', fontWeight: 600}}>Download CSV</button>
-        <span style={{color: '#666', fontSize: '0.9rem'}}>Export {points.length} records</span>
+        <button onClick={exportCSV} style={{padding: '0.9rem 1.5rem', border: 'none', borderRadius: '12px', background: 'linear-gradient(135deg,#0ea5e9,#6366f1)', color: '#fff', cursor: 'pointer', fontWeight: 700, boxShadow: '0 6px 18px rgba(99,102,241,0.35)'}}>Download CSV</button>
+        <span style={{color: '#475569', fontSize: '0.95rem', background: '#fff', padding: '0.5rem 0.9rem', borderRadius: '999px', border: '1px solid #e2e8f0'}}>Export {points.length} records</span>
       </section>
 
-      <section style={{marginTop: '2rem'}}>
-        <h2 style={{fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.75rem'}}>Survey Points</h2>
-        <div style={{overflowX: 'auto', border: '1px solid #e5e7eb', borderRadius: '12px'}}>
+      <section style={{marginTop: '2rem', background: '#fff', padding: '1.25rem', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.04)'}}>
+        <h2 style={{fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+          <span style={{display: 'inline-flex', width: '28px', height: '28px', borderRadius: '8px', background: '#10b981', color: '#fff', alignItems: 'center', justifyContent: 'center'}}>📊</span>
+          Survey Points
+        </h2>
+        <div style={{overflowX: 'auto', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
           <table style={{width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem'}}>
             <thead>
-              <tr style={{background: '#f9fafb'}}>
-                <th style={{borderBottom: '1px solid #e5e7eb', textAlign: 'left', padding: '0.75rem'}}>Time</th>
-                <th style={{borderBottom: '1px solid #e5e7eb', textAlign: 'left', padding: '0.75rem'}}>Category</th>
-                <th style={{borderBottom: '1px solid #e5e7eb', textAlign: 'left', padding: '0.75rem'}}>Lat</th>
-                <th style={{borderBottom: '1px solid #e5e7eb', textAlign: 'left', padding: '0.75rem'}}>Lon</th>
+              <tr style={{background: 'linear-gradient(135deg,#0ea5e9,#6366f1)', color: '#fff'}}>
+                <th style={{textAlign: 'left', padding: '0.85rem'}}>Time</th>
+                <th style={{textAlign: 'left', padding: '0.85rem'}}>Category</th>
+                <th style={{textAlign: 'left', padding: '0.85rem'}}>Lat</th>
+                <th style={{textAlign: 'left', padding: '0.85rem'}}>Lon</th>
               </tr>
             </thead>
             <tbody>
               {points.slice().reverse().map(p => (
-                <tr key={p.point_id} style={{borderBottom: '1px solid #f3f4f6'}}>
-                  <td style={{padding: '0.75rem'}}>{new Date(p.timestamp_utc).toLocaleTimeString()}</td>
-                  <td style={{padding: '0.75rem'}}>{p.category}</td>
-                  <td style={{padding: '0.75rem'}}>{p.latitude.toFixed(6)}</td>
-                  <td style={{padding: '0.75rem'}}>{p.longitude.toFixed(6)}</td>
+                <tr key={p.point_id} style={{borderBottom: '1px solid #f1f5f9'}}>
+                  <td style={{padding: '0.85rem'}}>{new Date(p.timestamp_utc).toLocaleTimeString()}</td>
+                  <td style={{padding: '0.85rem', fontWeight: 600}}>{p.category}</td>
+                  <td style={{padding: '0.85rem', fontFamily: 'ui-monospace, monospace'}}>{p.latitude.toFixed(6)}</td>
+                  <td style={{padding: '0.85rem', fontFamily: 'ui-monospace, monospace'}}>{p.longitude.toFixed(6)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </section>
-    </main>
-  );
-}
     </main>
   );
 }
