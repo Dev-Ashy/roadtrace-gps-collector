@@ -34,7 +34,7 @@ const INITIAL_CENTER: LivePosition = {
 
 export const Route = createFileRoute("/")({
   ssr: false,
-  component: CollectorPage,
+  component: SimpleCollectorPage,
   head: () => ({
     meta: [
       { title: "RoadTrace — GPS Highway Survey Recorder" },
@@ -407,5 +407,31 @@ function Metric({
       <p className="metric-value">{value}{unit && <span>{unit}</span>}</p>
       <p className="metric-detail">{detail}</p>
     </div>
+  );
+}
+
+function SimpleCollectorPage() {
+  const [position, setPosition] = useState<LivePosition | null>(null);
+  const [points, setPoints] = useState<SurveyPoint[]>([]);
+  const [notes, setNotes] = useState("");
+  const [audioEnabled, setAudioEnabled] = useState(false);
+
+  useEffect(() => {
+    const existing = readSavedPoints();
+    setPoints(existing);
+  }, []);
+
+  const handleLog = useCallback((category: SurveyCategory) => {
+    // minimal logging stub
+    setPoints(p => [...p]);
+  }, []);
+
+  return (
+    <main style={{padding: '2rem', fontFamily: 'sans-serif'}}>
+      <h1>RoadTrace GPS Data Collector</h1>
+      <p>Map temporarily disabled. Core logging UI is loading…</p>
+      {/* Minimal UI placeholder */}
+      <div>Points logged: {points.length}</div>
+    </main>
   );
 }
