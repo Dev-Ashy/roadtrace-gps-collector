@@ -34,7 +34,7 @@ const INITIAL_CENTER: LivePosition = {
 
 export const Route = createFileRoute("/")({
   ssr: false,
-  component: () => <div style={{padding: '2rem', fontFamily: 'sans-serif'}}>RoadTrace GPS Data Collector<br/>Map temporarily disabled for stability. Core logging UI available in next release.</div>,
+  component: CollectorPage,
   head: () => ({
     meta: [
       { title: "RoadTrace — GPS Highway Survey Recorder" },
