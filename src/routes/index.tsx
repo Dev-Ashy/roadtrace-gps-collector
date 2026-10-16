@@ -416,6 +416,7 @@ function SimpleCollectorPage() {
   const [notes, setNotes] = useState("");
   const [gpsMessage, setGpsMessage] = useState("Requesting high-accuracy location");
   const [autoCollect, setAutoCollect] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
   const categories: SurveyCategory[] = ["Bridge", "School zone", "Pothole / slump", "Sharp curve", "Speed bump", "Checkpoint / other"];
 
   useEffect(() => {
@@ -475,7 +476,7 @@ function SimpleCollectorPage() {
   }, [autoCollect, position]);
 
   const handleLog = (category: SurveyCategory) => {
-    if (!position) { setGpsMessage("Waiting for GPS fix"); return; }
+    if (!position) { setGpsMessage("Waiting for GPS fix"); setToast("GPS not ready"); setTimeout(() => setToast(null), 2000); return; }
     const id = `pt-${Date.now()}`;
     const point: SurveyPoint = {
       point_id: id,
@@ -490,6 +491,8 @@ function SimpleCollectorPage() {
     };
     setPoints(p => [...p, point]);
     setNotes("");
+    setToast(`Just recorded ${category.toLowerCase()}`);
+    setTimeout(() => setToast(null), 2500);
   };
 
   const exportCSV = () => {
@@ -505,63 +508,80 @@ function SimpleCollectorPage() {
   };
 
   return (
-    <main style={{padding: '2rem', fontFamily: 'sans-serif', maxWidth: '900px', margin: '0 auto'}}>
-      <h1>RoadTrace GPS Data Collector</h1>
-      <p style={{color: '#666'}}>Map temporarily disabled. Core logging UI active.</p>
-      <div style={{marginTop: '1rem', padding: '1rem', border: '1px solid #ddd', borderRadius: '8px'}}>
-        <strong>GPS Status:</strong> {gpsMessage}<br/>
-        <strong>Latitude:</strong> {position ? position.latitude.toFixed(6) : "—"}<br/>
-        <strong>Longitude:</strong> {position ? position.longitude.toFixed(6) : "—"}<br/>
-        <strong>Accuracy:</strong> {position ? `±${Math.round(position.accuracy)} m` : "—"}<br/>
-        <strong>Speed:</strong> {position?.speedKmh ? `${position.speedKmh.toFixed(1)} km/h` : "—"}<br/>
-        <strong>Altitude:</strong> {position?.altitude ? `${Math.round(position.altitude)} m` : "—"}<br/>
-        <strong>Points logged:</strong> {points.length}<br/>
-        <label style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem'}}>
-          <input type="checkbox" checked={autoCollect} onChange={e => setAutoCollect(e.target.checked)} />
-          Auto-collect every 10s when moving ≥15m
-        </label>
-      </div>
+    <main style={{padding: '2rem', fontFamily: 'system-ui, sans-serif', maxWidth: '960px', margin: '0 auto', color: '#111'}}>
+      {toast && (
+        <div style={{position: 'fixed', top: '1.5rem', right: '1.5rem', background: '#111', color: '#fff', padding: '0.75rem 1rem', borderRadius: '8px', boxShadow: '0 4px 16px rgba(0,0,0,0.2)', zIndex: 1000}}>
+          {toast}
+        </div>
+      )}
+      <header style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem'}}>
+        <h1 style={{fontSize: '1.75rem', fontWeight: 700, margin: 0}}>RoadTrace GPS Data Collector</h1>
+        <span style={{fontSize: '0.85rem', color: '#666'}}>Map temporarily disabled</span>
+      </header>
 
-      <div style={{marginTop: '2rem'}}>
-        <h2>Log Hazard</h2>
-        <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional notes" style={{width: '100%', minHeight: '60px', marginBottom: '1rem'}} />
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.5rem'}}>
+      <section style={{padding: '1.25rem', border: '1px solid #e5e7eb', borderRadius: '12px', background: '#fff', boxShadow: '0 1px 2px rgba(0,0,0,0.04)'}}>
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: '1rem'}}>
+          <div><div style={{fontSize: '0.75rem', color: '#666'}}>GPS Status</div><div style={{fontWeight: 600}}>{gpsMessage}</div></div>
+          <div><div style={{fontSize: '0.75rem', color: '#666'}}>Latitude</div><div style={{fontWeight: 600}}>{position ? position.latitude.toFixed(6) : "—"}</div></div>
+          <div><div style={{fontSize: '0.75rem', color: '#666'}}>Longitude</div><div style={{fontWeight: 600}}>{position ? position.longitude.toFixed(6) : "—"}</div></div>
+          <div><div style={{fontSize: '0.75rem', color: '#666'}}>Accuracy</div><div style={{fontWeight: 600}}>{position ? `±${Math.round(position.accuracy)} m` : "—"}</div></div>
+          <div><div style={{fontSize: '0.75rem', color: '#666'}}>Speed</div><div style={{fontWeight: 600}}>{position?.speedKmh ? `${position.speedKmh.toFixed(1)} km/h` : "—"}</div></div>
+          <div><div style={{fontSize: '0.75rem', color: '#666'}}>Altitude</div><div style={{fontWeight: 600}}>{position?.altitude ? `${Math.round(position.altitude)} m` : "—"}</div></div>
+        </div>
+        <div style={{marginTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+          <div style={{fontSize: '0.9rem'}}>Points logged: <strong>{points.length}</strong></div>
+          <label style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem'}}>
+            <input type="checkbox" checked={autoCollect} onChange={e => setAutoCollect(e.target.checked)} />
+            Auto-collect every 10s when moving ≥15m
+          </label>
+        </div>
+      </section>
+
+      <section style={{marginTop: '2rem'}}>
+        <h2 style={{fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.75rem'}}>Log Hazard</h2>
+        <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional notes" style={{width: '100%', minHeight: '72px', padding: '0.75rem', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '1rem', fontFamily: 'inherit'}} />
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem'}}>
           {categories.map(cat => (
-            <button key={cat} onClick={() => handleLog(cat)} style={{padding: '0.75rem', border: '1px solid #ccc', borderRadius: '6px', cursor: 'pointer'}}>
+            <button key={cat} onClick={() => handleLog(cat)} style={{padding: '0.85rem', border: '1px solid #e5e7eb', borderRadius: '10px', background: '#fff', cursor: 'pointer', fontWeight: 500, boxShadow: '0 1px 1px rgba(0,0,0,0.03)', transition: 'transform 0.05s'}} onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.98)')} onMouseUp={e => (e.currentTarget.style.transform = '')}>
               {cat}
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      <div style={{marginTop: '2rem'}}>
-        <h2>Export</h2>
-        <button onClick={exportCSV} style={{padding: '0.75rem 1.5rem', border: '1px solid #ccc', borderRadius: '6px', cursor: 'pointer'}}>Download CSV</button>
-      </div>
+      <section style={{marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem'}}>
+        <button onClick={exportCSV} style={{padding: '0.85rem 1.5rem', border: '1px solid #111', borderRadius: '10px', background: '#111', color: '#fff', cursor: 'pointer', fontWeight: 600}}>Download CSV</button>
+        <span style={{color: '#666', fontSize: '0.9rem'}}>Export {points.length} records</span>
+      </section>
 
-      <div style={{marginTop: '2rem'}}>
-        <h2>Survey Points</h2>
-        <table style={{width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem'}}>
-          <thead>
-            <tr>
-              <th style={{borderBottom: '1px solid #ddd', textAlign: 'left', padding: '0.5rem'}}>Time</th>
-              <th style={{borderBottom: '1px solid #ddd', textAlign: 'left', padding: '0.5rem'}}>Category</th>
-              <th style={{borderBottom: '1px solid #ddd', textAlign: 'left', padding: '0.5rem'}}>Lat</th>
-              <th style={{borderBottom: '1px solid #ddd', textAlign: 'left', padding: '0.5rem'}}>Lon</th>
-            </tr>
-          </thead>
-          <tbody>
-            {points.slice().reverse().map(p => (
-              <tr key={p.point_id}>
-                <td style={{padding: '0.5rem', borderBottom: '1px solid #eee'}}>{new Date(p.timestamp_utc).toLocaleTimeString()}</td>
-                <td style={{padding: '0.5rem', borderBottom: '1px solid #eee'}}>{p.category}</td>
-                <td style={{padding: '0.5rem', borderBottom: '1px solid #eee'}}>{p.latitude.toFixed(6)}</td>
-                <td style={{padding: '0.5rem', borderBottom: '1px solid #eee'}}>{p.longitude.toFixed(6)}</td>
+      <section style={{marginTop: '2rem'}}>
+        <h2 style={{fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.75rem'}}>Survey Points</h2>
+        <div style={{overflowX: 'auto', border: '1px solid #e5e7eb', borderRadius: '12px'}}>
+          <table style={{width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem'}}>
+            <thead>
+              <tr style={{background: '#f9fafb'}}>
+                <th style={{borderBottom: '1px solid #e5e7eb', textAlign: 'left', padding: '0.75rem'}}>Time</th>
+                <th style={{borderBottom: '1px solid #e5e7eb', textAlign: 'left', padding: '0.75rem'}}>Category</th>
+                <th style={{borderBottom: '1px solid #e5e7eb', textAlign: 'left', padding: '0.75rem'}}>Lat</th>
+                <th style={{borderBottom: '1px solid #e5e7eb', textAlign: 'left', padding: '0.75rem'}}>Lon</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {points.slice().reverse().map(p => (
+                <tr key={p.point_id} style={{borderBottom: '1px solid #f3f4f6'}}>
+                  <td style={{padding: '0.75rem'}}>{new Date(p.timestamp_utc).toLocaleTimeString()}</td>
+                  <td style={{padding: '0.75rem'}}>{p.category}</td>
+                  <td style={{padding: '0.75rem'}}>{p.latitude.toFixed(6)}</td>
+                  <td style={{padding: '0.75rem'}}>{p.longitude.toFixed(6)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  );
+}
     </main>
   );
 }
