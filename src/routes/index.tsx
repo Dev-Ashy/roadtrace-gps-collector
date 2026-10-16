@@ -34,7 +34,7 @@ const INITIAL_CENTER: LivePosition = {
 
 export const Route = createFileRoute("/")({
   ssr: false,
-  component: CollectorPage,
+  component: SimpleCollectorPage,
   head: () => ({
     meta: [
       { title: "RoadTrace — GPS Highway Survey Recorder" },
@@ -414,8 +414,8 @@ function SimpleCollectorPage() {
   const [position, setPosition] = useState<LivePosition | null>(null);
   const [points, setPoints] = useState<SurveyPoint[]>([]);
   const [notes, setNotes] = useState("");
-  const [audioEnabled, setAudioEnabled] = useState(false);
   const [gpsMessage, setGpsMessage] = useState("Requesting high-accuracy location");
+  const categories: SurveyCategory[] = ["Bridge", "School zone", "Pothole / slump", "Sharp curve", "Speed bump", "Checkpoint / other"];
 
   useEffect(() => {
     const existing = readSavedPoints();
@@ -440,15 +440,89 @@ function SimpleCollectorPage() {
     }
   }, []);
 
+  const handleLog = (category: SurveyCategory) => {
+    if (!position) { setGpsMessage("Waiting for GPS fix"); return; }
+    const id = `pt-${Date.now()}`;
+    const point: SurveyPoint = {
+      point_id: id,
+      timestamp_utc: new Date().toISOString(),
+      category,
+      latitude: position.latitude,
+      longitude: position.longitude,
+      accuracy_meters: position.accuracy,
+      speed_kmh: position.speedKmh,
+      altitude_m: position.altitude,
+      notes: notes.trim(),
+    };
+    setPoints(p => [...p, point]);
+    setNotes("");
+  };
+
+  const exportCSV = () => {
+    const header = "point_id,timestamp_utc,category,latitude,longitude,accuracy_meters,speed_kmh,altitude_m,notes";
+    const rows = points.map(p => `${p.point_id},${p.timestamp_utc},${p.category},${p.latitude},${p.longitude},${p.accuracy_meters},${p.speed_kmh ?? ""},${p.altitude_m ?? ""},${p.notes.replace(/,/g, " ")}`);
+    const blob = new Blob([header + "\n" + rows.join("\n")], {type: "text/csv"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "roadtrace-survey.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
-    <main style={{padding: '2rem', fontFamily: 'sans-serif'}}>
+    <main style={{padding: '2rem', fontFamily: 'sans-serif', maxWidth: '900px', margin: '0 auto'}}>
       <h1>RoadTrace GPS Data Collector</h1>
-      <div style={{marginTop: '1rem'}}>
+      <p style={{color: '#666'}}>Map temporarily disabled. Core logging UI active.</p>
+      <div style={{marginTop: '1rem', padding: '1rem', border: '1px solid #ddd', borderRadius: '8px'}}>
         <strong>GPS Status:</strong> {gpsMessage}<br/>
         <strong>Latitude:</strong> {position ? position.latitude.toFixed(6) : "—"}<br/>
         <strong>Longitude:</strong> {position ? position.longitude.toFixed(6) : "—"}<br/>
         <strong>Accuracy:</strong> {position ? `±${Math.round(position.accuracy)} m` : "—"}<br/>
+        <strong>Speed:</strong> {position?.speedKmh ? `${position.speedKmh.toFixed(1)} km/h` : "—"}<br/>
+        <strong>Altitude:</strong> {position?.altitude ? `${Math.round(position.altitude)} m` : "—"}<br/>
         <strong>Points logged:</strong> {points.length}
+      </div>
+
+      <div style={{marginTop: '2rem'}}>
+        <h2>Log Hazard</h2>
+        <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional notes" style={{width: '100%', minHeight: '60px', marginBottom: '1rem'}} />
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.5rem'}}>
+          {categories.map(cat => (
+            <button key={cat} onClick={() => handleLog(cat)} style={{padding: '0.75rem', border: '1px solid #ccc', borderRadius: '6px', cursor: 'pointer'}}>
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{marginTop: '2rem'}}>
+        <h2>Export</h2>
+        <button onClick={exportCSV} style={{padding: '0.75rem 1.5rem', border: '1px solid #ccc', borderRadius: '6px', cursor: 'pointer'}}>Download CSV</button>
+      </div>
+
+      <div style={{marginTop: '2rem'}}>
+        <h2>Survey Points</h2>
+        <table style={{width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem'}}>
+          <thead>
+            <tr>
+              <th style={{borderBottom: '1px solid #ddd', textAlign: 'left', padding: '0.5rem'}}>Time</th>
+              <th style={{borderBottom: '1px solid #ddd', textAlign: 'left', padding: '0.5rem'}}>Category</th>
+              <th style={{borderBottom: '1px solid #ddd', textAlign: 'left', padding: '0.5rem'}}>Lat</th>
+              <th style={{borderBottom: '1px solid #ddd', textAlign: 'left', padding: '0.5rem'}}>Lon</th>
+            </tr>
+          </thead>
+          <tbody>
+            {points.slice().reverse().map(p => (
+              <tr key={p.point_id}>
+                <td style={{padding: '0.5rem', borderBottom: '1px solid #eee'}}>{new Date(p.timestamp_utc).toLocaleTimeString()}</td>
+                <td style={{padding: '0.5rem', borderBottom: '1px solid #eee'}}>{p.category}</td>
+                <td style={{padding: '0.5rem', borderBottom: '1px solid #eee'}}>{p.latitude.toFixed(6)}</td>
+                <td style={{padding: '0.5rem', borderBottom: '1px solid #eee'}}>{p.longitude.toFixed(6)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </main>
   );
