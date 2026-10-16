@@ -415,6 +415,7 @@ function SimpleCollectorPage() {
   const [points, setPoints] = useState<SurveyPoint[]>([]);
   const [notes, setNotes] = useState("");
   const [gpsMessage, setGpsMessage] = useState("Requesting high-accuracy location");
+  const [autoCollect, setAutoCollect] = useState(false);
   const categories: SurveyCategory[] = ["Bridge", "School zone", "Pothole / slump", "Sharp curve", "Speed bump", "Checkpoint / other"];
 
   useEffect(() => {
@@ -439,6 +440,39 @@ function SimpleCollectorPage() {
       return () => navigator.geolocation.clearWatch(id);
     }
   }, []);
+
+  // Persist points to localStorage
+  useEffect(() => {
+    try { window.localStorage.setItem("corridor-survey-records-v1", JSON.stringify(points)); } catch {}
+  }, [points]);
+
+  // Auto collect points while moving
+  useEffect(() => {
+    if (!autoCollect || !position) return;
+    const interval = setInterval(() => {
+      setPoints(prev => {
+        const last = prev[prev.length - 1];
+        if (last && position) {
+          const dist = Math.sqrt(Math.pow(last.latitude - position.latitude, 2) + Math.pow(last.longitude - position.longitude, 2)) * 111000;
+          if (dist < 15) return prev;
+        }
+        const id = `auto-${Date.now()}`;
+        const point: SurveyPoint = {
+          point_id: id,
+          timestamp_utc: new Date().toISOString(),
+          category: "Checkpoint / other",
+          latitude: position.latitude,
+          longitude: position.longitude,
+          accuracy_meters: position.accuracy,
+          speed_kmh: position.speedKmh,
+          altitude_m: position.altitude,
+          notes: "Auto-collected",
+        };
+        return [...prev, point];
+      });
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [autoCollect, position]);
 
   const handleLog = (category: SurveyCategory) => {
     if (!position) { setGpsMessage("Waiting for GPS fix"); return; }
@@ -481,7 +515,11 @@ function SimpleCollectorPage() {
         <strong>Accuracy:</strong> {position ? `±${Math.round(position.accuracy)} m` : "—"}<br/>
         <strong>Speed:</strong> {position?.speedKmh ? `${position.speedKmh.toFixed(1)} km/h` : "—"}<br/>
         <strong>Altitude:</strong> {position?.altitude ? `${Math.round(position.altitude)} m` : "—"}<br/>
-        <strong>Points logged:</strong> {points.length}
+        <strong>Points logged:</strong> {points.length}<br/>
+        <label style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem'}}>
+          <input type="checkbox" checked={autoCollect} onChange={e => setAutoCollect(e.target.checked)} />
+          Auto-collect every 10s when moving ≥15m
+        </label>
       </div>
 
       <div style={{marginTop: '2rem'}}>
