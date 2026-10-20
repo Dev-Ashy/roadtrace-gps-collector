@@ -417,9 +417,17 @@ function SimpleCollectorPage() {
   const [gpsMessage, setGpsMessage] = useState("Requesting high-accuracy location");
   const [autoCollect, setAutoCollect] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [route, setRoute] = useState<"Kuje to IPPIS" | "Kuje to Lokoja">("Kuje to Lokoja");
+  const userName = "Bello Abdurrazak";
   const categories: SurveyCategory[] = ["Bridge", "School zone", "Slump", "Sharp curve", "Steep slope"];
 
   useEffect(() => {
+    // Personal greeting audio on load
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      const utter = new SpeechSynthesisUtterance(`Salam alaikum, Mr. ${userName}. Ready to copy coordinates of bridge and survey points. Please select your route.`);
+      utter.rate = 0.95;
+      window.speechSynthesis.speak(utter);
+    }
     const existing = readSavedPoints();
     setPoints(existing);
     if (typeof navigator !== "undefined" && navigator.geolocation) {
@@ -531,90 +539,97 @@ function SimpleCollectorPage() {
   };
 
   return (
-    <main style={{padding: '1.5rem 1rem', fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif', maxWidth: '1040px', margin: '0 auto', color: '#111', background: '#f6f7fb', minHeight: '100vh'}}>
+    <main style={{padding: '1.5rem 1rem', fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif', maxWidth: '1040px', margin: '0 auto', color: '#fff', minHeight: '100vh', background: 'radial-gradient(1200px 600px at 80% -10%, rgba(99,102,241,0.35), transparent), radial-gradient(800px 400px at -10% 20%, rgba(14,165,233,0.3), transparent), #0b1020'}}>
       {toast && (
-        <div style={{position: 'fixed', top: '1.5rem', right: '1.5rem', background: '#0ea5e9', color: '#fff', padding: '0.75rem 1rem', borderRadius: '10px', boxShadow: '0 8px 24px rgba(0,0,0,0.18)', zIndex: 1000, fontWeight: 600}}>
+        <div style={{position: 'fixed', top: '1.5rem', right: '1.5rem', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', color: '#fff', padding: '0.75rem 1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.18)', boxShadow: '0 8px 24px rgba(0,0,0,0.25)', zIndex: 1000, fontWeight: 600}}>
           {toast}
         </div>
       )}
-      <header style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem'}}>
+      <header style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem'}}>
         <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem'}}>
-          <div style={{width: '40px', height: '40px', borderRadius: '10px', background: 'linear-gradient(135deg,#0ea5e9,#6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700}}>RT</div>
-          <h1 style={{fontSize: '1.75rem', fontWeight: 800, margin: 0, letterSpacing: '-0.02em'}}>RoadTrace</h1>
+          <div style={{width: '44px', height: '44px', borderRadius: '14px', background: 'linear-gradient(135deg,#0ea5e9,#6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, boxShadow: '0 8px 20px rgba(99,102,241,0.45)'}}>RT</div>
+          <div>
+            <h1 style={{fontSize: '1.8rem', fontWeight: 800, margin: 0, letterSpacing: '-0.02em'}}>RoadTrace</h1>
+            <div style={{fontSize: '0.85rem', color: 'rgba(255,255,255,0.75)', marginTop: '-2px'}}>Salam alaikum, Mr. {userName}</div>
+          </div>
         </div>
-        <span style={{fontSize: '0.85rem', color: '#64748b', background: '#fff', padding: '0.35rem 0.75rem', borderRadius: '999px', border: '1px solid #e2e8f0'}}>Map disabled</span>
+        <div style={{background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.15)', padding: '0.5rem 0.9rem', borderRadius: '999px', fontSize: '0.85rem'}}>Liquid Glass UI</div>
       </header>
 
-      <section style={{padding: '1.25rem', borderRadius: '16px', background: 'linear-gradient(135deg,#ffffff,#f8fafc)', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0'}}>
+      <div style={{background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '16px', padding: '0.9rem 1rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem'}}>
+        <div style={{fontSize: '0.95rem', opacity: 0.9}}>Kindly select your route</div>
+        <div style={{display: 'flex', gap: '0.5rem'}}>
+          {["Kuje to IPPIS","Kuje to Lokoja"].map(r => (
+            <button key={r} onClick={() => {setRoute(r as any); setToast(`Route set to ${r}`); setTimeout(()=>setToast(null),2000);}} style={{padding: '0.5rem 1rem', borderRadius: '999px', border: route===r ? '1px solid #fff' : '1px solid rgba(255,255,255,0.25)', background: route===r ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.06)', color: '#fff', cursor: 'pointer', fontWeight: 600}}>{r}</button>
+          ))}
+        </div>
+      </div>
+
+      <section style={{padding: '1.25rem', borderRadius: '20px', background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.18)', boxShadow: '0 8px 32px rgba(0,0,0,0.25)'}}>
         <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px,1fr))', gap: '1rem'}}>
-          <div style={{background: '#fff', padding: '0.9rem', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
-            <div style={{fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em'}}>GPS Status</div>
-            <div style={{fontWeight: 700, marginTop: '0.25rem', color: position ? '#16a34a' : '#dc2626'}}>{gpsMessage}</div>
-          </div>
-          <div style={{background: '#fff', padding: '0.9rem', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
-            <div style={{fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase'}}>Latitude</div>
-            <div style={{fontWeight: 700, marginTop: '0.25rem'}}>{position ? position.latitude.toFixed(6) : "—"}</div>
-          </div>
-          <div style={{background: '#fff', padding: '0.9rem', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
-            <div style={{fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase'}}>Longitude</div>
-            <div style={{fontWeight: 700, marginTop: '0.25rem'}}>{position ? position.longitude.toFixed(6) : "—"}</div>
-          </div>
-          <div style={{background: '#fff', padding: '0.9rem', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
-            <div style={{fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase'}}>Accuracy</div>
-            <div style={{fontWeight: 700, marginTop: '0.25rem'}}>{position ? `±${Math.round(position.accuracy)} m` : "—"}</div>
-          </div>
-          <div style={{background: '#fff', padding: '0.9rem', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
-            <div style={{fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase'}}>Speed</div>
-            <div style={{fontWeight: 700, marginTop: '0.25rem'}}>{position?.speedKmh ? `${position.speedKmh.toFixed(1)} km/h` : "—"}</div>
-          </div>
-          <div style={{background: '#fff', padding: '0.9rem', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
-            <div style={{fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase'}}>Altitude</div>
-            <div style={{fontWeight: 700, marginTop: '0.25rem'}}>{position?.altitude ? `${Math.round(position.altitude)} m` : "—"}</div>
-          </div>
+          {[
+            ["GPS Status", gpsMessage, position ? '#a7f3d0' : '#fecaca'],
+            ["Latitude", position ? position.latitude.toFixed(6) : "—", '#e0e7ff'],
+            ["Longitude", position ? position.longitude.toFixed(6) : "—", '#e0e7ff'],
+            ["Accuracy", position ? `±${Math.round(position.accuracy)} m` : "—", '#fef3c7'],
+            ["Speed", position?.speedKmh ? `${position.speedKmh.toFixed(1)} km/h` : "—", '#dbeafe'],
+            ["Altitude", position?.altitude ? `${Math.round(position.altitude)} m` : "—", '#dcfce7'],
+          ].map(([label,val,color])=>(
+            <div key={label as string} style={{background: 'rgba(255,255,255,0.06)', padding: '0.9rem', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.12)'}}>
+              <div style={{fontSize: '0.7rem', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.05em'}}>{label}</div>
+              <div style={{fontWeight: 700, marginTop: '0.25rem', color: '#fff'}}>{val}</div>
+            </div>
+          ))}
         </div>
         <div style={{marginTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem'}}>
-          <div style={{fontSize: '0.95rem', background: '#fff', padding: '0.5rem 0.9rem', borderRadius: '999px', border: '1px solid #e2e8f0'}}>Points logged: <strong>{points.length}</strong></div>
-          <label style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', background: '#fff', padding: '0.5rem 0.9rem', borderRadius: '999px', border: '1px solid #e2e8f0'}}>
+          <div style={{fontSize: '0.95rem', background: 'rgba(255,255,255,0.08)', padding: '0.5rem 0.9rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.18)', color: '#fff'}}>Points logged: <strong>{points.length}</strong></div>
+          <label style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', background: 'rgba(255,255,255,0.08)', padding: '0.5rem 0.9rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.18)', color: '#fff'}}>
             <input type="checkbox" checked={autoCollect} onChange={e => setAutoCollect(e.target.checked)} />
-            Auto-collect every 10s when moving ≥15m
+            Auto-collect every 10s
           </label>
         </div>
+        {position && (
+          <div style={{marginTop: '0.9rem', display: 'flex', gap: '0.5rem', alignItems: 'center'}}>
+            <button onClick={()=>{navigator.clipboard.writeText(`${position.latitude.toFixed(6)},${position.longitude.toFixed(6)}`); setToast('Coordinates copied'); setTimeout(()=>setToast(null),2000);}} style={{padding: '0.55rem 0.9rem', borderRadius: '999px', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', fontWeight: 600}}>Copy coordinates</button>
+            <span style={{fontSize: '0.85rem', opacity: 0.8}}>Route: {route}</span>
+          </div>
+        )}
       </section>
 
-      <section style={{marginTop: '2rem', background: '#fff', padding: '1.25rem', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.04)'}}>
+      <section style={{marginTop: '1.5rem', background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.18)', padding: '1.25rem', borderRadius: '20px', boxShadow: '0 8px 32px rgba(0,0,0,0.25)'}}>
         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem'}}>
-          <h2 style={{fontSize: '1.25rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-            <span style={{display: 'inline-flex', width: '28px', height: '28px', borderRadius: '8px', background: '#0ea5e9', color: '#fff', alignItems: 'center', justifyContent: 'center'}}>⚠</span>
+          <h2 style={{fontSize: '1.25rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fff'}}>
+            <span style={{display: 'inline-flex', width: '28px', height: '28px', borderRadius: '8px', background: 'rgba(255,255,255,0.18)', color: '#fff', alignItems: 'center', justifyContent: 'center'}}>⚠</span>
             Log Hazard
           </h2>
-          <button onClick={handleLogAll} style={{padding: '0.55rem 0.9rem', borderRadius: '10px', background: '#10b981', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer'}}>Select All</button>
+          <button onClick={handleLogAll} style={{padding: '0.55rem 0.9rem', borderRadius: '999px', background: 'rgba(16,185,129,0.25)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', fontWeight: 700, cursor: 'pointer'}}>Select All</button>
         </div>
-        <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional notes" style={{width: '100%', minHeight: '72px', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '12px', marginBottom: '1rem', fontFamily: 'inherit'}} />
+        <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional notes" style={{width: '100%', minHeight: '72px', padding: '0.75rem', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '12px', marginBottom: '1rem', fontFamily: 'inherit', background: 'rgba(255,255,255,0.06)', color: '#fff', outline: 'none'}} />
         <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem'}}>
           {categories.map((cat, i) => {
-            const colors = ['#0ea5e9','#8b5cf6','#f59e0b','#10b981','#ef4444'];
+            const colors = ['rgba(14,165,233,0.35)','rgba(139,92,246,0.35)','rgba(245,158,11,0.35)','rgba(16,185,129,0.35)','rgba(239,68,68,0.35)'];
             return (
-            <button key={cat} onClick={() => handleLog(cat)} style={{padding: '0.9rem', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fff', cursor: 'pointer', fontWeight: 600, boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'transform 0.05s', borderLeft: `4px solid ${colors[i % colors.length]}`}} onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.98)')} onMouseUp={e => (e.currentTarget.style.transform = '')}>
+            <button key={cat} onClick={() => handleLog(cat)} style={{padding: '0.9rem', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '14px', background: colors[i % colors.length], cursor: 'pointer', fontWeight: 600, color: '#fff', transition: 'transform 0.05s'}} onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.98)')} onMouseUp={e => (e.currentTarget.style.transform = '')}>
               {cat}
             </button>
           )})}
         </div>
       </section>
 
-      <section style={{marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem'}}>
+      <section style={{marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem'}}>
         <button onClick={exportCSV} style={{padding: '0.9rem 1.5rem', border: 'none', borderRadius: '12px', background: 'linear-gradient(135deg,#0ea5e9,#6366f1)', color: '#fff', cursor: 'pointer', fontWeight: 700, boxShadow: '0 6px 18px rgba(99,102,241,0.35)'}}>Download CSV</button>
-        <span style={{color: '#475569', fontSize: '0.95rem', background: '#fff', padding: '0.5rem 0.9rem', borderRadius: '999px', border: '1px solid #e2e8f0'}}>Export {points.length} records</span>
+        <span style={{color: '#fff', fontSize: '0.95rem', background: 'rgba(255,255,255,0.08)', padding: '0.5rem 0.9rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.18)'}}>Export {points.length} records</span>
       </section>
 
-      <section style={{marginTop: '2rem', background: '#fff', padding: '1.25rem', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.04)'}}>
-        <h2 style={{fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-          <span style={{display: 'inline-flex', width: '28px', height: '28px', borderRadius: '8px', background: '#10b981', color: '#fff', alignItems: 'center', justifyContent: 'center'}}>📊</span>
+      <section style={{marginTop: '1.5rem', background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.18)', padding: '1.25rem', borderRadius: '20px', boxShadow: '0 8px 32px rgba(0,0,0,0.25)'}}>
+        <h2 style={{fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fff'}}>
+          <span style={{display: 'inline-flex', width: '28px', height: '28px', borderRadius: '8px', background: 'rgba(255,255,255,0.18)', color: '#fff', alignItems: 'center', justifyContent: 'center'}}>📊</span>
           Survey Points
         </h2>
-        <div style={{overflowX: 'auto', borderRadius: '12px', border: '1px solid #e2e8f0'}}>
+        <div style={{overflowX: 'auto', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.18)'}}>
           <table style={{width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem'}}>
             <thead>
-              <tr style={{background: 'linear-gradient(135deg,#0ea5e9,#6366f1)', color: '#fff'}}>
+              <tr style={{background: 'rgba(255,255,255,0.12)', color: '#fff'}}>
                 <th style={{textAlign: 'left', padding: '0.85rem'}}>Time</th>
                 <th style={{textAlign: 'left', padding: '0.85rem'}}>Category</th>
                 <th style={{textAlign: 'left', padding: '0.85rem'}}>Lat</th>
@@ -623,7 +638,7 @@ function SimpleCollectorPage() {
             </thead>
             <tbody>
               {points.slice().reverse().map(p => (
-                <tr key={p.point_id} style={{borderBottom: '1px solid #f1f5f9'}}>
+                <tr key={p.point_id} style={{borderBottom: '1px solid rgba(255,255,255,0.08)', color: '#fff'}}>
                   <td style={{padding: '0.85rem'}}>{new Date(p.timestamp_utc).toLocaleTimeString()}</td>
                   <td style={{padding: '0.85rem', fontWeight: 600}}>{p.category}</td>
                   <td style={{padding: '0.85rem', fontFamily: 'ui-monospace, monospace'}}>{p.latitude.toFixed(6)}</td>
