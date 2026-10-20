@@ -417,7 +417,7 @@ function SimpleCollectorPage() {
   const [gpsMessage, setGpsMessage] = useState("Requesting high-accuracy location");
   const [autoCollect, setAutoCollect] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const categories: SurveyCategory[] = ["Bridge", "School zone", "Pothole / slump", "Sharp curve", "Speed bump", "Checkpoint / other"];
+  const categories: SurveyCategory[] = ["Bridge", "School zone", "Slump", "Sharp curve", "Steep slope"];
 
   useEffect(() => {
     const existing = readSavedPoints();
@@ -477,7 +477,7 @@ function SimpleCollectorPage() {
 
   const handleLog = (category: SurveyCategory) => {
     if (!position) { setGpsMessage("Waiting for GPS fix"); setToast("GPS not ready"); setTimeout(() => setToast(null), 2000); return; }
-    const id = `pt-${Date.now()}`;
+    const id = `pt-${Date.now()}-${Math.random().toString(36).slice(2,6)}`;
     const point: SurveyPoint = {
       point_id: id,
       timestamp_utc: new Date().toISOString(),
@@ -490,8 +490,31 @@ function SimpleCollectorPage() {
       notes: notes.trim(),
     };
     setPoints(p => [...p, point]);
-    setNotes("");
     setToast(`Just recorded ${category.toLowerCase()}`);
+    setTimeout(() => setToast(null), 2500);
+  };
+
+  const handleLogAll = () => {
+    if (!position) { setToast("GPS not ready"); setTimeout(() => setToast(null), 2000); return; }
+    categories.forEach((cat, i) => {
+      setTimeout(() => {
+        const id = `pt-${Date.now()}-${i}`;
+        const point: SurveyPoint = {
+          point_id: id,
+          timestamp_utc: new Date().toISOString(),
+          category: cat,
+          latitude: position.latitude,
+          longitude: position.longitude,
+          accuracy_meters: position.accuracy,
+          speed_kmh: position.speedKmh,
+          altitude_m: position.altitude,
+          notes: notes.trim(),
+        };
+        setPoints(p => [...p, point]);
+      }, i * 50);
+    });
+    setNotes("");
+    setToast("Recorded all 5 categories");
     setTimeout(() => setToast(null), 2500);
   };
 
@@ -559,14 +582,17 @@ function SimpleCollectorPage() {
       </section>
 
       <section style={{marginTop: '2rem', background: '#fff', padding: '1.25rem', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.04)'}}>
-        <h2 style={{fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-          <span style={{display: 'inline-flex', width: '28px', height: '28px', borderRadius: '8px', background: '#0ea5e9', color: '#fff', alignItems: 'center', justifyContent: 'center'}}>⚠</span>
-          Log Hazard
-        </h2>
+        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem'}}>
+          <h2 style={{fontSize: '1.25rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            <span style={{display: 'inline-flex', width: '28px', height: '28px', borderRadius: '8px', background: '#0ea5e9', color: '#fff', alignItems: 'center', justifyContent: 'center'}}>⚠</span>
+            Log Hazard
+          </h2>
+          <button onClick={handleLogAll} style={{padding: '0.55rem 0.9rem', borderRadius: '10px', background: '#10b981', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer'}}>Select All</button>
+        </div>
         <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional notes" style={{width: '100%', minHeight: '72px', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '12px', marginBottom: '1rem', fontFamily: 'inherit'}} />
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem'}}>
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem'}}>
           {categories.map((cat, i) => {
-            const colors = ['#0ea5e9','#8b5cf6','#f59e0b','#10b981','#ef4444','#6366f1'];
+            const colors = ['#0ea5e9','#8b5cf6','#f59e0b','#10b981','#ef4444'];
             return (
             <button key={cat} onClick={() => handleLog(cat)} style={{padding: '0.9rem', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#fff', cursor: 'pointer', fontWeight: 600, boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'transform 0.05s', borderLeft: `4px solid ${colors[i % colors.length]}`}} onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.98)')} onMouseUp={e => (e.currentTarget.style.transform = '')}>
               {cat}
