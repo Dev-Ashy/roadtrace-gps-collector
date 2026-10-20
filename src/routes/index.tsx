@@ -415,7 +415,7 @@ function SimpleCollectorPage() {
   const [points, setPoints] = useState<SurveyPoint[]>([]);
   const [notes, setNotes] = useState("");
   const [gpsMessage, setGpsMessage] = useState("Requesting high-accuracy location");
-  const [autoCollect, setAutoCollect] = useState(false);
+  const [autoCopy, setAutoCopy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [route, setRoute] = useState<"Kuje to IPPIS" | "Kuje to Lokoja">("Kuje to Lokoja");
   const userName = "Bello Abdurrazak";
@@ -455,33 +455,25 @@ function SimpleCollectorPage() {
     try { window.localStorage.setItem("corridor-survey-records-v1", JSON.stringify(points)); } catch {}
   }, [points]);
 
-  // Auto collect points while moving
+  // Auto copy coordinates every 10s using real GPS data
   useEffect(() => {
-    if (!autoCollect || !position) return;
+    if (!autoCopy || !position) return;
     const interval = setInterval(() => {
-      setPoints(prev => {
-        const last = prev[prev.length - 1];
-        if (last && position) {
-          const dist = Math.sqrt(Math.pow(last.latitude - position.latitude, 2) + Math.pow(last.longitude - position.longitude, 2)) * 111000;
-          if (dist < 15) return prev;
+      try {
+        const coord = `${position.latitude.toFixed(6)},${position.longitude.toFixed(6)}`;
+        navigator.clipboard.writeText(coord);
+        setToast(`Coordinates copied: ${coord}`);
+        setTimeout(()=>setToast(null), 2000);
+        // Optional speech of coordinates
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+          const utter = new SpeechSynthesisUtterance(`Coordinate ${position.latitude.toFixed(6)} ${position.longitude.toFixed(6)}`);
+          utter.volume = 0.8;
+          window.speechSynthesis.speak(utter);
         }
-        const id = `auto-${Date.now()}`;
-        const point: SurveyPoint = {
-          point_id: id,
-          timestamp_utc: new Date().toISOString(),
-          category: "Checkpoint / other",
-          latitude: position.latitude,
-          longitude: position.longitude,
-          accuracy_meters: position.accuracy,
-          speed_kmh: position.speedKmh,
-          altitude_m: position.altitude,
-          notes: "Auto-collected",
-        };
-        return [...prev, point];
-      });
+      } catch {}
     }, 10000);
     return () => clearInterval(interval);
-  }, [autoCollect, position]);
+  }, [autoCopy, position]);
 
   const handleLog = (category: SurveyCategory) => {
     if (!position) { setGpsMessage("Waiting for GPS fix"); setToast("GPS not ready"); setTimeout(() => setToast(null), 2000); return; }
@@ -584,8 +576,8 @@ function SimpleCollectorPage() {
         <div style={{marginTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem'}}>
           <div style={{fontSize: '0.95rem', background: 'rgba(255,255,255,0.08)', padding: '0.5rem 0.9rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.18)', color: '#fff'}}>Points logged: <strong>{points.length}</strong></div>
           <label style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', background: 'rgba(255,255,255,0.08)', padding: '0.5rem 0.9rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.18)', color: '#fff'}}>
-            <input type="checkbox" checked={autoCollect} onChange={e => setAutoCollect(e.target.checked)} />
-            Auto-collect every 10s
+            <input type="checkbox" checked={autoCopy} onChange={e => setAutoCopy(e.target.checked)} />
+            Auto-copy coords every 10s
           </label>
         </div>
         {position && (
